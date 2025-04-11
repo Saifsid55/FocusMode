@@ -39,3 +39,13 @@
 - ✅ Reusable UI components
 
 ---
+
+## 🧪 Screenshots
+
+| Home | Timer (Start) | Timer (Stop) |
+|------|---------------|--------------|
+| ![Home](screenshots/Home%20Page.png) | ![Timer 1](screenshots/Timer%20Page%201.png) | ![Stop](screenshots/Stop%20Timer.png) |
+
+| Timer (Running) | Profile |
+|------------------|---------|
+| ![Timer 2](screenshots/Timer%20Page%202.png) | ![Profile](screenshots/Profile%20Page.png) |
