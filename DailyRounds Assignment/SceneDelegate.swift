@@ -21,6 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let homeViewController = HomeViewController()
         window?.rootViewController = UINavigationController(rootViewController: homeViewController)
         window?.makeKeyAndVisible()
+        showTimerIfNeeded()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -33,10 +34,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-        if let (session, elapsed) = StorageManager.shared.getOngoingSession(),
-           !SessionManager.shared.isRunning {
-            SessionManager.shared.resumeSession(session: session, elapsed: elapsed)
-        }
+        showTimerIfNeeded()
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -53,8 +51,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+        if let session = SessionManager.shared.currentSession {
+            let startTime = SessionManager.shared.getStartTime()
+            StorageManager.shared.saveOngoingSession(session, startTime: startTime)
+        }
     }
+    
+    func showTimerIfNeeded() {
+        if let (session, elapsed) = StorageManager.shared.getOngoingSession(),
+           !SessionManager.shared.isRunning,
+           let window = self.window,
+           let nav = window.rootViewController as? UINavigationController {
 
+            // Resume session
+            SessionManager.shared.resumeSession(session: session, elapsed: elapsed)
 
+            // Push TimerViewController
+            let timerVC = TimerViewController()
+            nav.pushViewController(timerVC, animated: false)
+        }
+    }
 }
 

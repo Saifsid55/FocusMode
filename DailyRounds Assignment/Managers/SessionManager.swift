@@ -63,26 +63,46 @@ final class SessionManager {
         startTimer()
     }
     
+    func calculateBadges(for elapsed: TimeInterval) -> [Badge] {
+        let badgeCount = Int(elapsed) / 120
+        return (0..<badgeCount).map { _ in Badge.randomBadge() }
+    }
+
     func getElapsedTime() -> TimeInterval {
         guard let start = startTime else { return elapsedTime }
         return Date().timeIntervalSince(start)
     }
     
+    func getStartTime() -> Date {
+        return startTime ?? Date()
+    }
+    
     private func startTimer() {
         timer?.invalidate()
         timer = nil
+
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            self.elapsedTime += 1
-            if self.elapsedTime - self.lastBadgeTime >= 120 {
-                let newBadge = Badge.randomBadge()
-                self.badgesEarned.append(newBadge)
-                self.lastBadgeTime = self.elapsedTime
-                NotificationCenter.default.post(name: .badgeAwarded, object: newBadge)
+            self.elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
+
+            // 💡 Calculate how many full 2-min blocks have passed
+            let expectedBadgeCount = Int(self.elapsedTime) / 120
+            let currentBadgeCount = self.badgesEarned.count
+            let newBadgesNeeded = expectedBadgeCount - currentBadgeCount
+
+            // ✅ Award missing badges
+            if newBadgesNeeded > 0 {
+                for _ in 0..<newBadgesNeeded {
+                    let badge = Badge.randomBadge()
+                    self.badgesEarned.append(badge)
+                    self.currentSession?.badges = self.badgesEarned
+                    NotificationCenter.default.post(name: .badgeAwarded, object: badge)
+                }
             }
-            
+
             NotificationCenter.default.post(name: .timerTicked, object: nil)
         }
     }
+
 }
 
 extension Notification.Name {

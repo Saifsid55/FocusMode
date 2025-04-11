@@ -42,6 +42,7 @@ class TimerViewController: UIViewController {
         setupLayout()
         bindViewModel()
         updateTimerLabel()
+        updateBadgeLabel()
     }
     
     override func viewWillAppear(_ animated: Bool) {

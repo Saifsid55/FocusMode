@@ -14,6 +14,9 @@ final class TimerViewModel {
     var onSessionEnd: ((Session) -> Void)?
     
     init() {
+        if let current = SessionManager.shared.currentSession {
+            self.badges = current.badges
+        }
         NotificationCenter.default.addObserver(self, selector: #selector(timerUpdated), name: .timerTicked, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(badgeAwarded(_:)), name: .badgeAwarded, object: nil)
     }
