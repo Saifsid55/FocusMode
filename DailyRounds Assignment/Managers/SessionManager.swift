@@ -13,7 +13,8 @@ final class SessionManager {
     private var timer: Timer?
     private var elapsedTime: TimeInterval = 0
     private var lastBadgeTime: TimeInterval = 0
-    
+    private var startTime: Date?
+
     private(set) var currentSession: Session?
     private(set) var isRunning = false
     private var badgesEarned: [Badge] = []
@@ -29,6 +30,7 @@ final class SessionManager {
             points: 0,
             badges: []
         )
+        startTime = Date()
         currentSession = session
         elapsedTime = 0
         lastBadgeTime = 0
@@ -54,6 +56,7 @@ final class SessionManager {
     func resumeSession(session: Session, elapsed: TimeInterval) {
         currentSession = session
         elapsedTime = elapsed
+        startTime = Date().addingTimeInterval(-elapsed)
         lastBadgeTime = elapsed
         badgesEarned = session.badges
         isRunning = true
@@ -61,7 +64,8 @@ final class SessionManager {
     }
     
     func getElapsedTime() -> TimeInterval {
-        return elapsedTime
+        guard let start = startTime else { return elapsedTime }
+        return Date().timeIntervalSince(start)
     }
     
     private func startTimer() {
